@@ -1,31 +1,25 @@
-name: ADLS Access via Managed Identity Federation
+name: Azure Federated Auth Demo
 
 on:
   push:
     branches:
       - main
 
-permissions:
-  id-token: write  # Required to request OIDC token
-  contents: read
-
 jobs:
-  access-adls:
+  auth-azure:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write      # This enables GitHub OIDC token issuance to the job
+      contents: read
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: 'Login to Azure with OIDC federated credentials'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Login to Azure using federated credential
-        run: |
-          az login --federated-token $ACTIONS_ID_TOKEN --allow-no-subscriptions --service-principal --tenant ${{ secrets.AZURE_TENANT_ID }} --username ${{ secrets.AZURE_CLIENT_ID }}
-        env:
-          ACTIONS_ID_TOKEN: ${{ steps.oidc-token.outputs.token }}
-      - name: Get OIDC token
-        id: oidc-token
-        run: echo "::set-output name=token::${{ steps.get_token.outputs.id_token }}"
-
-      - name: Access ADLS
-        run: |
-          az storage blob list --account-name <storage-account-name> --container-name <container-name> --auth-mode login
+      - name: Show success message
+        run: echo "✅ Successfully authenticated with Azure using federated credentials!"

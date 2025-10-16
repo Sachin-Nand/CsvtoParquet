@@ -23,3 +23,8 @@ jobs:
           
       - name: Show success message
         run: echo "✅ Successfully authenticated with Azure using federated credentials!"
+
+      - name: 'Run az commands'
+        run: |
+          az account show
+          az group list

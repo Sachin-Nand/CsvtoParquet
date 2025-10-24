@@ -28,5 +28,5 @@ jobs:
         run: |
           az account show
           az group list        
-          az storage account list  --query "[].{Name:name, Kind:kind, Location:primaryLocation}" -o table
+          az account list-locations --query "[].{Name:name, DisplayName:displayName}" -o table
   
